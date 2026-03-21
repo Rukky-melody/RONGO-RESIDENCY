@@ -1,0 +1,6 @@
+node_modules/
+.env
+out.txt
+push_to_git.bat
+.vscode/
+package-lock.json

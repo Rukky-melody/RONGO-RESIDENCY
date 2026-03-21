@@ -1,0 +1,26 @@
+{
+  "name": "rongo",
+  "version": "1.0.0",
+  "description": "\"# RONGOARTS\"",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rukky-melody/RONGOARTS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Rukky-melody/RONGOARTS/issues"
+  },
+  "homepage": "https://github.com/Rukky-melody/RONGOARTS#readme",
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "mongodb": "^7.1.0",
+    "mongoose": "^9.2.3",
+    "nodemailer": "^8.0.1"
+  }
+}

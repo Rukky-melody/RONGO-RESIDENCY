@@ -9,7 +9,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Rukky-melody/RONGOARTS.git"
+    "url": "git+https://github.com/Rukky-melody/RONGO-RESIDENCY.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +24,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^17.3.1",
+    "express": "^4.21.2",
     "mongodb": "^7.1.0",
     "mongoose": "^9.2.3",
     "nodemailer": "^8.0.1"

@@ -9,6 +9,9 @@ const app = express();
 app.use(cors()); // Allow all origins for now, can be restricted later
 const PORT = process.env.PORT || 2026;
 
+console.log('--- Initializing Rongo Server ---');
+console.log(`Port Configured: ${PORT}`);
+
 // 1. Database Connection
 connectDB();
 

@@ -17,11 +17,11 @@ const registerUser = async (req, res) => {
         try {
             const info = await sendWelcomeEmail(email, fullname);
             console.log("✅ Step 3: Email sent!", info.response);
-            res.send(`<h2>Success! Welcome email sent to ${email}.</h2><a href="/">Return Home</a>`);
+            res.redirect('/success.html');
         } catch (error) {
             console.log("❌ Nodemailer Error:", error.message);
             // Even if mail fails, the user is already saved in the DB
-            return res.status(500).send("Registration saved, but welcome email failed: " + error.message);
+            return res.redirect('/success.html?emailError=' + encodeURIComponent(error.message));
         }
 
     } catch (err) {

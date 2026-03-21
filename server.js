@@ -1,10 +1,12 @@
 require('dotenv').config(); 
 const express = require('express');
+const cors = require('cors');
 const path = require('path');
 const connectDB = require('./config/db');
 const subscriberRoutes = require('./routes/subscriberRoutes');
 
 const app = express();
+app.use(cors()); // Allow all origins for now, can be restricted later
 const PORT = process.env.PORT || 2026;
 
 // 1. Database Connection

@@ -6,10 +6,19 @@ const registerUser = async (req, res) => {
     try {
         const { fullname, email } = req.body;
         
-        // Save to MongoDB
-        const newSubscriber = new Subscriber({ fullname, email });
-        await newSubscriber.save();
-        console.log("✅ Step 1: User saved to Atlas");
+        // 1. Save or Find User in MongoDB
+        try {
+            const newSubscriber = new Subscriber({ fullname, email });
+            await newSubscriber.save();
+            console.log("✅ Step 1: User saved to Atlas");
+        } catch (dbErr) {
+            if (dbErr.code === 11000) {
+                console.log("ℹ️ Step 1: User already exists. Proceeding to resend email.");
+            } else {
+                // If it's some other DB error, throw it to the outer catch
+                throw dbErr;
+            }
+        }
 
         console.log("Step 2: Preparing Email...");
         
@@ -25,7 +34,7 @@ const registerUser = async (req, res) => {
         }
 
     } catch (err) {
-        console.log("❌ Database Error or Duplicate Email:", err.message);
+        console.log("❌ Database Error:", err.message);
         res.status(500).send("Database error: " + err.message);
     }
 };

@@ -28,4 +28,4 @@ app.use((err, req, res, next) => {
     res.status(500).send('An unexpected error occurred: ' + err.message);
 });
 
-app.listen(PORT, () => console.log(`Server live on port ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => console.log(`Server live on port ${PORT}`));

@@ -1,25 +1,13 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-const createTransporter = () => {
-    return nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false, // upgrades later with STARTTLS
-        auth: {
-            user: process.env.EMAIL_USER,
-            // .replace(/\s+/g, '') ensures spaces in the App Password don't break the login
-            pass: process.env.EMAIL_PASS.replace(/\s+/g, '') 
-        },
-        connectionTimeout: 10000, // fail fast instead of hanging the UI
-    });
-};
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendWelcomeEmail = async (email, fullname) => {
-    const transporter = createTransporter();
-
-    const mailOptions = {
-        from: `"Rongo Art Foundation" <${process.env.EMAIL_USER}>`,
-        to: email,
+    return await resend.emails.send({
+        // IMPORTANT: You MUST verify the domain you want to send from on the Resend dashboard.
+        // If you don't have a verified domain on Resend, you can only send emails to yourself!
+        from: 'Rongo Art Foundation <onboarding@resend.dev>', // Temporary testing email provided by Resend
+        to: email, // If testing without a domain, this MUST be your own registered Resend email address
         subject: 'Welcome to the Rongo Art Foundation',
         html: `
             <div style="font-family: sans-serif; padding: 20px; border: 1px solid #3B5254;">
@@ -28,16 +16,6 @@ const sendWelcomeEmail = async (email, fullname) => {
                 <p>We are dedicated to preserving heritage and empowering artistic excellence.</p>
             </div>
         `
-    };
-
-    return new Promise((resolve, reject) => {
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                reject(error);
-            } else {
-                resolve(info);
-            }
-        });
     });
 };
 

@@ -27,6 +27,6 @@
     "express": "^4.21.2",
     "mongodb": "^7.1.0",
     "mongoose": "^9.2.3",
-    "nodemailer": "^8.0.1"
+    "resend": "^6.9.4"
   }
 }

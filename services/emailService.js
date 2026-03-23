@@ -2,12 +2,15 @@ const nodemailer = require('nodemailer');
 
 const createTransporter = () => {
     return nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false, // upgrades later with STARTTLS
         auth: {
             user: process.env.EMAIL_USER,
             // .replace(/\s+/g, '') ensures spaces in the App Password don't break the login
             pass: process.env.EMAIL_PASS.replace(/\s+/g, '') 
-        }
+        },
+        connectionTimeout: 10000, // fail fast instead of hanging the UI
     });
 };
 

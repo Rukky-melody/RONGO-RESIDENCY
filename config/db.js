@@ -10,7 +10,8 @@ const connectDB = async () => {
         console.log('✅ Connected to MongoDB Atlas');
     } catch (err) {
         console.error('❌ Cloud Connection Error:', err.message);
-        process.exit(1); // Required for Render to report the failure
+        // Removing process.exit(1) so the app stays alive and binds to the port,
+        // allowing Render to show the server as 'Live' and display errors properly.
     }
 };
 

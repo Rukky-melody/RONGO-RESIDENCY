@@ -26,15 +26,24 @@ const registerUser = async (req, res) => {
         try {
             const info = await sendWelcomeEmail(email, fullname);
             console.log("✅ Step 3: Email sent!", info.response);
+            if (req.headers.accept && req.headers.accept.includes('application/json')) {
+                return res.json({ success: true, redirectUrl: '/success.html' });
+            }
             res.redirect('/success.html');
         } catch (error) {
             console.log("❌ Nodemailer Error:", error.message);
             // Even if mail fails, the user is already saved in the DB
+            if (req.headers.accept && req.headers.accept.includes('application/json')) {
+                return res.json({ success: true, redirectUrl: '/success.html?emailError=' + encodeURIComponent(error.message) });
+            }
             return res.redirect('/success.html?emailError=' + encodeURIComponent(error.message));
         }
 
     } catch (err) {
         console.log("❌ Database Error:", err.message);
+        if (req.headers.accept && req.headers.accept.includes('application/json')) {
+            return res.status(500).json({ error: "Database error: " + err.message });
+        }
         res.status(500).send("Database error: " + err.message);
     }
 };

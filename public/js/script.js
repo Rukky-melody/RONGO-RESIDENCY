@@ -218,3 +218,64 @@ document.addEventListener("DOMContentLoaded", () => {
 
     counters.forEach(counter => countObserver.observe(counter));
 });
+
+/* ==========================================================================
+   4. FORM SUBMISSION (AJAX)
+   ========================================================================== */
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.querySelector('.rongo-form');
+    if (form) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerText;
+            submitBtn.innerText = 'PLEASE WAIT...';
+            submitBtn.disabled = true;
+
+            const formData = new FormData(form);
+            const data = new URLSearchParams(formData);
+
+            try {
+                // Requesting application/json will often instruct proxies/Render 
+                // to delay returning the loading HTML until the server finishes.
+                const response = await fetch(form.action, {
+                    method: form.method,
+                    body: data,
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        const result = await response.json();
+                        if (result.success && result.redirectUrl) {
+                            window.location.href = result.redirectUrl;
+                        } else {
+                            window.location.href = '/success.html';
+                        }
+                    } else {
+                        // In case Render still intercepts and sends back the HTML loading page with 200 OK
+                        const text = await response.text();
+                        if (text.includes('START BUILDING ON RENDER TODAY')) {
+                            alert('The server is currently waking up from sleep. Please wait a moment and try submitting again.');
+                        } else {
+                            window.location.href = '/success.html';
+                        }
+                    }
+                } else {
+                    alert('Something went wrong. Please try again later.');
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                alert('Connection error. Please check your internet connection and try again.');
+            } finally {
+                submitBtn.innerText = originalBtnText;
+                submitBtn.disabled = false;
+            }
+        });
+    }
+});

@@ -16,6 +16,7 @@ console.log(`Port Configured: ${PORT}`);
 connectDB();
 
 // 2. Middleware
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 

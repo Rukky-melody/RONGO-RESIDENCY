@@ -25,13 +25,13 @@ const registerUser = async (req, res) => {
         // Step 3: Send the Email
         try {
             const info = await sendWelcomeEmail(email, fullname);
-            console.log("✅ Step 3: Email sent!", info.response);
+            console.log("✅ Step 3: Email sent!", info.messageId);
             if (req.headers.accept && req.headers.accept.includes('application/json')) {
                 return res.json({ success: true, redirectUrl: '/success.html' });
             }
             res.redirect('/success.html');
         } catch (error) {
-            console.log("❌ Nodemailer Error:", error.message);
+            console.log("❌ Brevo API Error:", error.message);
             // Even if mail fails, the user is already saved in the DB
             if (req.headers.accept && req.headers.accept.includes('application/json')) {
                 return res.json({ success: true, redirectUrl: '/success.html?emailError=' + encodeURIComponent(error.message) });

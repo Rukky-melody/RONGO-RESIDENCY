@@ -842,6 +842,9 @@ h1, h2, h3 {
     .intro-body {
         column-count: 1;
     }
+    .intro-body p {
+        text-align: left;
+    }
 }
 
 /* Mission & Vision Section */
@@ -891,6 +894,7 @@ h1, h2, h3 {
 }
 @media (max-width: 768px) {
     .mv-grid { grid-template-columns: 1fr; }
+    .mv-card p { text-align: left; }
 }
 
 /* Our Work Section */
@@ -947,6 +951,9 @@ h1, h2, h3 {
     margin-bottom: 10px;
     font-weight: 700;
 }
+@media (max-width: 768px) {
+    .work-card p { text-align: left; }
+}
 
 /* Flagship Platforms */
 .platforms-section {
@@ -995,6 +1002,7 @@ h1, h2, h3 {
 }
 @media (max-width: 992px) {
     .platform-grid { grid-template-columns: 1fr; }
+    .platform-content p { text-align: left; }
 }
 
 /* Impact Section */

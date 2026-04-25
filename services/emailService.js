@@ -1,16 +1,26 @@
-const { BrevoClient } = require('@getbrevo/brevo');
+const nodemailer = require('nodemailer');
 
 const sendWelcomeEmail = async (email, fullname) => {
-    const client = new BrevoClient({
-        apiKey: process.env.BREVO_API_KEY,
-        timeoutInSeconds: 60 // Increased timeout for slower network conditions
+    // 1. Create a transporter using Brevo SMTP details
+    const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: parseInt(process.env.SMTP_PORT),
+        secure: false, // true for 465, false for other ports
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
+        },
     });
 
     try {
-        console.log(`Attempting to send Brevo email to: ${email}...`);
-        const data = await client.transactionalEmails.sendTransacEmail({
+        console.log(`Attempting to send email via SMTP to: ${email}...`);
+        
+        const mailOptions = {
+            from: `"Rongo Art Foundation" <${process.env.EMAIL_USER}>`,
+            to: email,
             subject: "Welcome to the Rongo Art Foundation",
-            htmlContent: `
+            text: `Dear ${fullname},\n\nWelcome and thank you for joining the Rongo Art Foundation community.\n\nWe exist to equip emerging artists in Nigeria with the structural support, legal literacy, and digital protection required for sustainable growth. By subscribing, you'll be the first to receive updates on our flagship programs like the Rongo Artist Residency, the Benin Arts and Books Festival, and other exclusive creative opportunities.\n\nWe look forward to an inspiring journey together in preserving our heritage while empowering artistic excellence.\n\nBest regards,\nRongo Art Foundation\nRooted in heritage. Focused on structure. Committed to the future.`,
+            html: `
                 <div style="background-color: #F9F7F2; padding: 40px 20px; margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
                     <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 40px; border-radius: 4px; border-top: 4px solid #3B5254; box-shadow: 0 4px 15px rgba(0,0,0,0.05); color: #333333; line-height: 1.6;">
                         
@@ -36,15 +46,14 @@ const sendWelcomeEmail = async (email, fullname) => {
                         </div>
                     </div>
                 </div>
-            `,
-            textContent: `Dear ${fullname},\n\nWelcome and thank you for joining the Rongo Art Foundation community.\n\nWe exist to equip emerging artists in Nigeria with the structural support, legal literacy, and digital protection required for sustainable growth. By subscribing, you'll be the first to receive updates on our flagship programs like the Rongo Artist Residency, the Benin Arts and Books Festival, and other exclusive creative opportunities.\n\nWe look forward to an inspiring journey together in preserving our heritage while empowering artistic excellence.\n\nBest regards,\nRongo Art Foundation\nRooted in heritage. Focused on structure. Committed to the future.`,
-            sender: { "name": "Rongo Art Foundation", "email": process.env.EMAIL_USER },
-            replyTo: { "email": process.env.EMAIL_USER },
-            to: [{ "email": email, "name": fullname }]
-        });
-        return data;
+            `
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+        console.log("✅ Email sent successfully:", info.messageId);
+        return info;
     } catch (error) {
-        console.error('Brevo API Error:', error);
+        console.error('Nodemailer Error:', error);
         throw error;
     }
 };

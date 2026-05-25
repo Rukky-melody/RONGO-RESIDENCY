@@ -22,22 +22,16 @@ const registerUser = async (req, res) => {
 
         console.log("Step 2: Preparing Email...");
         
-        // Step 3: Send the Email
-        try {
-            const info = await sendWelcomeEmail(email, fullname);
-            console.log("✅ Step 3: Email sent!", info.messageId);
-            if (req.headers.accept && req.headers.accept.includes('application/json')) {
-                return res.json({ success: true, redirectUrl: '/success.html' });
-            }
-            res.redirect('/success.html');
-        } catch (error) {
-            console.log("❌ Email Service Error:", error.message);
-            // Even if mail fails, the user is already saved in the DB
-            if (req.headers.accept && req.headers.accept.includes('application/json')) {
-                return res.json({ success: true, redirectUrl: '/success.html?emailError=' + encodeURIComponent(error.message) });
-            }
-            return res.redirect('/success.html?emailError=' + encodeURIComponent(error.message));
+        // Step 3: Send the Email in the background (Fire and forget)
+        sendWelcomeEmail(email, fullname).catch(error => {
+            console.error("❌ Background Email Service Error:", error.message);
+        });
+
+        console.log("✅ Step 3: Email triggered in background.");
+        if (req.headers.accept && req.headers.accept.includes('application/json')) {
+            return res.json({ success: true, redirectUrl: '/success.html' });
         }
+        return res.redirect('/success.html');
 
     } catch (err) {
         console.log("❌ Database Error:", err.message);

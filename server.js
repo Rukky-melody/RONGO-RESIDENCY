@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const connectDB = require('./config/db');
 const subscriberRoutes = require('./routes/subscriberRoutes');
 
 const app = express();
@@ -10,6 +11,9 @@ const PORT = process.env.PORT || 2026;
 
 console.log('--- Initializing Rongo Server ---');
 console.log(`Port Configured: ${PORT}`);
+
+// 1. Database Connection
+connectDB();
 
 // 2. Middleware
 app.use(express.json());

@@ -65,4 +65,44 @@ const sendWelcomeEmail = async (email, fullname) => {
     }
 };
 
-module.exports = { sendWelcomeEmail };
+const addContactToBrevo = async (email, fullname) => {
+    // We split the fullname to attempt to get a FIRSTNAME and LASTNAME
+    const nameParts = fullname.split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
+    try {
+        console.log(`Attempting to add ${email} to Brevo Contacts List...`);
+        const response = await fetch('https://api.brevo.com/v3/contacts', {
+            method: 'POST',
+            headers: {
+                'accept': 'application/json',
+                'content-type': 'application/json',
+                'api-key': process.env.BREVO_API_KEY
+            },
+            body: JSON.stringify({
+                email: email,
+                attributes: {
+                    FIRSTNAME: firstName,
+                    LASTNAME: lastName
+                }
+            })
+        });
+
+        if (response.ok) {
+            console.log("✅ Successfully added to Brevo Contacts.");
+        } else {
+            const errorData = await response.json();
+            // Code 'duplicate_parameter' means they are already in the contacts list!
+            if (errorData.code === 'duplicate_parameter') {
+                console.log("ℹ️ Contact already exists in Brevo Contacts List.");
+            } else {
+                console.error("❌ Failed to add to Brevo Contacts:", errorData);
+            }
+        }
+    } catch (err) {
+        console.error("❌ Network error when adding to Brevo:", err.message);
+    }
+};
+
+module.exports = { sendWelcomeEmail, addContactToBrevo };

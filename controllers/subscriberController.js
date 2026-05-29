@@ -1,5 +1,5 @@
 const Subscriber = require('../models/Subscriber');
-const { sendWelcomeEmail } = require('../services/emailService');
+const { sendWelcomeEmail, addContactToBrevo } = require('../services/emailService');
 
 const registerUser = async (req, res) => {
     console.log("--- New Request Received ---");
@@ -20,14 +20,18 @@ const registerUser = async (req, res) => {
             }
         }
 
-        console.log("Step 2: Preparing Email...");
+        console.log("Step 2: Preparing Email & Syncing Contacts...");
         
-        // Step 3: Send the Email in the background (Fire and forget)
+        // Step 3: Send the Email and Sync Contact in the background (Fire and forget)
         sendWelcomeEmail(email, fullname).catch(error => {
             console.error("❌ Background Email Service Error:", error.message);
         });
+        
+        addContactToBrevo(email, fullname).catch(error => {
+            console.error("❌ Background Brevo Contact Sync Error:", error.message);
+        });
 
-        console.log("✅ Step 3: Email triggered in background.");
+        console.log("✅ Step 3: Email and Contact Sync triggered in background.");
         if (req.headers.accept && req.headers.accept.includes('application/json')) {
             return res.json({ success: true, redirectUrl: '/success.html' });
         }

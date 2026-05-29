@@ -17,9 +17,10 @@ const sendWelcomeEmail = async (email, fullname) => {
         
         const mailOptions = {
             from: `"Rongo Art Foundation" <${process.env.EMAIL_USER}>`,
+            replyTo: process.env.EMAIL_USER,
             to: email,
             subject: "Welcome to the Rongo Art Foundation",
-            text: `Dear ${fullname},\n\nWelcome and thank you for joining the Rongo Art Foundation community.\n\nWe exist to equip emerging artists in Nigeria with the structural support, legal literacy, and digital protection required for sustainable growth. By subscribing, you'll be the first to receive updates on our flagship programs like the Rongo Artist Residency, the Benin Arts and Books Festival, and other exclusive creative opportunities.\n\nWe look forward to an inspiring journey together in preserving our heritage while empowering artistic excellence.\n\nBest regards,\nRongo Art Foundation\nRooted in heritage. Focused on structure. Committed to the future.`,
+            text: `Dear ${fullname},\n\nWelcome and thank you for joining the Rongo Art Foundation community.\n\nWe exist to equip emerging artists in Nigeria with the structural support, legal literacy, and digital protection required for sustainable growth. By subscribing, you'll be the first to receive updates on our flagship programs like the Rongo Artist Residency, the Benin Arts and Books Festival, and other exclusive creative opportunities.\n\nWe look forward to an inspiring journey together in preserving our heritage while empowering artistic excellence.\n\nBest regards,\nRongo Art Foundation\nRooted in heritage. Focused on structure. Committed to the future.\n\nP.S. To ensure our future updates go straight to your primary inbox, please reply "Hello" to this email or add us to your contacts!`,
             html: `
                 <div style="background-color: #F9F7F2; padding: 40px 20px; margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
                     <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 40px; border-radius: 4px; border-top: 4px solid #3B5254; box-shadow: 0 4px 15px rgba(0,0,0,0.05); color: #333333; line-height: 1.6;">
@@ -43,6 +44,12 @@ const sendWelcomeEmail = async (email, fullname) => {
                         <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eeeeee; text-align: center;">
                             <p style="font-size: 14px; color: #3B5254; font-weight: bold; margin: 0; letter-spacing: 1px;">RONGO ART FOUNDATION</p>
                             <p style="font-size: 12px; color: #888888; margin-top: 5px; font-style: italic;">Rooted in heritage. Focused on structure. Committed to the future.</p>
+                        </div>
+                        
+                        <div style="margin-top: 30px; padding: 15px; background-color: #f0f4f4; border-radius: 4px; text-align: center;">
+                            <p style="font-size: 13px; color: #444; margin: 0;">
+                                <strong>P.S.</strong> To ensure our future updates go straight to your primary inbox, please reply <em>"Hello"</em> to this email or add us to your contacts!
+                            </p>
                         </div>
                     </div>
                 </div>

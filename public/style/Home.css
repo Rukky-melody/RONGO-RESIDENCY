@@ -370,6 +370,14 @@ h1, h2, h3 {
     color: #567476;
 }
 
+.footer-copyright {
+    margin-top: 40px;
+    font-size: 0.8rem;
+    color: rgba(59, 82, 84, 0.7);
+    letter-spacing: 0.5px;
+    text-align: center;
+}
+
 /* ==========================================================================
    HOMEPAGE GALLERY SECTION
    ========================================================================== */

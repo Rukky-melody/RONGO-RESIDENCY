@@ -12,6 +12,12 @@
 }
 html{
     scroll-behavior: smooth;
+    scroll-snap-type: y mandatory;
+    scroll-padding-top: 80px;
+}
+
+header.hero, header.about-hero, section, footer {
+    scroll-snap-align: start;
 }
 
 footer {
@@ -453,8 +459,6 @@ h1, h2, h3 {
     display: flex;
     gap: 30px;
     overflow-x: auto;
-    scroll-behavior: smooth;
-    scroll-snap-type: x mandatory;
     padding: 30px 40px;
     mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
     -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
@@ -471,7 +475,6 @@ h1, h2, h3 {
     padding: 40px 20px;
     text-align: center;
     box-shadow: 0 5px 20px rgba(0,0,0,0.03);
-    scroll-snap-align: start;
     transition: transform 0.3s ease;
 }
 .team-card:hover {

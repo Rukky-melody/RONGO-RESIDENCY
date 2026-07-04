@@ -175,18 +175,5 @@
     </section>
 
     <script src="./js/script.js"></script>
-    <script>
-        // Simple menu toggle logic specifically for privacy page mobile view if needed
-        document.addEventListener("DOMContentLoaded", () => {
-            const menuTrigger = document.querySelector('#mobile-menu');
-            const navContainer = document.querySelector('.nav-links');
-            if(menuTrigger && navContainer) {
-                menuTrigger.addEventListener('click', () => {
-                    menuTrigger.classList.toggle('active');
-                    navContainer.classList.toggle('active');
-                });
-            }
-        });
-    </script>
 </body>
 </html>

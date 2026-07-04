@@ -27,6 +27,7 @@ let typeSpeed = 150;
  * Adjusts timing based on user experience (slower typing, faster deletion).
  */
 function initTypewriter() {
+    if (!textElement) return;
     const currentPhrase = phrases[phraseIndex];
     
     if (isDeleting) {

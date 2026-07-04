@@ -885,9 +885,9 @@ h1, h2, h3 {
 }
 .mv-card p {
     font-size: 1.05rem;
-    line-height: 1.7;
+    line-height: 1.6;
     color: #555;
-    text-align: justify;
+    text-align: left;
 }
 .vision-mantra {
     font-weight: 600;

@@ -378,6 +378,20 @@ h1, h2, h3 {
     text-align: center;
 }
 
+.footer-copyright a {
+    color: rgba(59, 82, 84, 0.7);
+    text-decoration: underline;
+    transition: color 0.3s ease;
+}
+
+.footer-copyright a:hover {
+    color: var(--accent-color);
+}
+
+.privacy-link {
+    margin-top: 5px;
+}
+
 /* ==========================================================================
    HOMEPAGE GALLERY SECTION
    ========================================================================== */

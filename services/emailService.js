@@ -14,7 +14,7 @@ const sendWelcomeEmail = async (email, fullname) => {
 
     try {
         console.log(`Attempting to send email via SMTP to: ${email}...`);
-        
+
         const mailOptions = {
             from: `"Rongo Art Foundation" <${process.env.EMAIL_USER}>`,
             replyTo: process.env.EMAIL_USER,

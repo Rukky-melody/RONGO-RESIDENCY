@@ -5,6 +5,10 @@
     {
       "source": "/register",
       "destination": "https://rongo-residency.onrender.com/register"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "https://rongo-residency.onrender.com/api/:path*"
     }
   ]
 }

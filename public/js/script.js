@@ -302,7 +302,7 @@ async function loadAboutContent() {
     if (!leadEl || !bodyEl) return;
 
     try {
-        const res  = await fetch('/api/about');
+        const res  = await fetch('https://rongo-residency.onrender.com/api/about');
         if (!res.ok) return;
         const data = await res.json();
 
@@ -331,7 +331,7 @@ async function loadTeamMembers() {
     if (!track) return;
 
     try {
-        const res     = await fetch('/api/team');
+        const res     = await fetch('https://rongo-residency.onrender.com/api/team');
         if (!res.ok) return;
         const members = await res.json();
 
@@ -386,7 +386,7 @@ async function loadAnnouncement() {
     if (sessionStorage.getItem('rongo_ann_dismissed')) return;
 
     try {
-        const res  = await fetch('/api/announcement');
+        const res  = await fetch('https://rongo-residency.onrender.com/api/announcement');
         if (!res.ok) return;
         const ann  = await res.json();
         if (!ann || !ann.isActive) return;

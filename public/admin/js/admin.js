@@ -9,7 +9,7 @@
    1. CONFIG & AUTH UTILITIES
 ════════════════════════════════════════════════════════════ */
 
-const API = ''; // Relative URL — admin is served from same Express server
+const API = 'https://rongo-residency.onrender.com'; // Direct to Render backend
 
 function getToken()  { return localStorage.getItem('admin_token'); }
 function getAdmin()  { try { return JSON.parse(localStorage.getItem('admin_info')); } catch { return null; } }

@@ -23,11 +23,16 @@
   "homepage": "https://github.com/Rukky-melody/RONGOARTS#readme",
   "dependencies": {
     "@getbrevo/brevo": "^5.0.3",
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.10.1",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.3.1",
     "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.3",
     "mongodb": "^7.1.0",
     "mongoose": "^9.2.3",
+    "multer": "^2.2.0",
     "nodemailer": "^8.0.5"
   }
 }

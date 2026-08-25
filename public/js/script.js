@@ -280,3 +280,141 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+/* ==========================================================================
+   5. CMS DYNAMIC CONTENT LOADERS
+   Fetches About text, Team members, and Announcements from the Express API.
+   ========================================================================== */
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadAboutContent();
+    loadTeamMembers();
+    loadAnnouncement();
+});
+
+/**
+ * Fetches About section content from /api/about and populates
+ * #about-lead and #about-body in index.html.
+ */
+async function loadAboutContent() {
+    const leadEl = document.getElementById('about-lead');
+    const bodyEl = document.getElementById('about-body');
+    if (!leadEl || !bodyEl) return;
+
+    try {
+        const res  = await fetch('/api/about');
+        if (!res.ok) return;
+        const data = await res.json();
+
+        // Render lead text — bold the first sentence to match brand style
+        if (data.leadText) {
+            leadEl.innerHTML = data.leadText;
+        }
+
+        // Render body paragraphs
+        if (data.bodyParagraphs && data.bodyParagraphs.length) {
+            bodyEl.innerHTML = data.bodyParagraphs
+                .map(p => `<p>${p}</p>`)
+                .join('');
+        }
+    } catch (err) {
+        console.warn('Could not load About content from CMS:', err.message);
+    }
+}
+
+/**
+ * Fetches team members from /api/team and renders cards into #team-track.
+ * Falls back gracefully if no members exist yet.
+ */
+async function loadTeamMembers() {
+    const track = document.getElementById('team-track');
+    if (!track) return;
+
+    try {
+        const res     = await fetch('/api/team');
+        if (!res.ok) return;
+        const members = await res.json();
+
+        if (!members || members.length === 0) {
+            track.innerHTML = `
+                <div class="team-card" style="opacity:0.5; pointer-events:none;">
+                    <div class="team-avatar"><i class="fa-solid fa-users"></i></div>
+                    <h3>Team Coming Soon</h3>
+                    <p>Check back shortly</p>
+                </div>`;
+            return;
+        }
+
+        track.innerHTML = members.map(m => `
+            <div class="team-card">
+                <div class="team-avatar" style="${m.profileImage ? 'padding:0;overflow:hidden;' : ''}">
+                    ${m.profileImage
+                        ? `<img src="${m.profileImage}" alt="${m.name}" style="width:100%;height:100%;object-fit:cover;">`
+                        : `<i class="fa-solid fa-user"></i>`}
+                </div>
+                <h3>${m.name}</h3>
+                <p>${m.role}</p>
+            </div>`).join('');
+
+        // Re-initialise slider buttons after dynamic injection
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
+        if (prevBtn && nextBtn) {
+            prevBtn.addEventListener('click', () => {
+                const cardWidth = track.querySelector('.team-card').offsetWidth;
+                track.scrollBy({ left: -(cardWidth + 30), behavior: 'smooth' });
+            });
+            nextBtn.addEventListener('click', () => {
+                const cardWidth = track.querySelector('.team-card').offsetWidth;
+                track.scrollBy({ left: cardWidth + 30, behavior: 'smooth' });
+            });
+        }
+    } catch (err) {
+        console.warn('Could not load team members from CMS:', err.message);
+    }
+}
+
+/**
+ * Fetches the active announcement from /api/announcement.
+ * Shows the popup once per session (sessionStorage prevents repeat shows).
+ */
+async function loadAnnouncement() {
+    const overlay = document.getElementById('announcement-overlay');
+    if (!overlay) return;
+
+    // Only show once per browser session
+    if (sessionStorage.getItem('rongo_ann_dismissed')) return;
+
+    try {
+        const res  = await fetch('/api/announcement');
+        if (!res.ok) return;
+        const ann  = await res.json();
+        if (!ann || !ann.isActive) return;
+
+        // Populate popup content
+        document.getElementById('announcement-title').textContent   = ann.title;
+        document.getElementById('announcement-message').textContent = ann.message;
+        document.getElementById('announcement-header').style.background = ann.backgroundColor || '#3B5254';
+
+        // Show optional CTA button
+        const ctaEl = document.getElementById('announcement-cta');
+        if (ann.ctaLabel && ann.ctaUrl) {
+            ctaEl.textContent = ann.ctaLabel;
+            ctaEl.href        = ann.ctaUrl;
+            ctaEl.style.background = ann.backgroundColor || '#3B5254';
+            ctaEl.style.display    = 'inline-block';
+        }
+
+        // Show overlay
+        overlay.style.display = 'flex';
+    } catch (err) {
+        console.warn('Could not load announcement from CMS:', err.message);
+    }
+}
+
+/** Closes the announcement popup and marks it dismissed for this session */
+function dismissAnnouncement() {
+    const overlay = document.getElementById('announcement-overlay');
+    if (overlay) overlay.style.display = 'none';
+    sessionStorage.setItem('rongo_ann_dismissed', '1');
+}

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Rongo CMS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="./css/admin.css">
+</head>
+<body>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<!-- Sidebar overlay (mobile) -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="admin-layout">
+
+    <!-- ═══ SIDEBAR ══════════════════════════════════════════ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <h2>Rongo Foundation</h2>
+            <p>Content Management</p>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-item active" data-tab="about">
+                <i class="fa-solid fa-align-left"></i>
+                <span>About Section</span>
+            </div>
+            <div class="nav-item" data-tab="team">
+                <i class="fa-solid fa-users"></i>
+                <span>Our Team</span>
+            </div>
+            <div class="nav-item" data-tab="announcements">
+                <i class="fa-solid fa-bullhorn"></i>
+                <span>Announcements</span>
+            </div>
+            <div class="nav-item" data-tab="subscribers">
+                <i class="fa-solid fa-envelope"></i>
+                <span>Subscribers</span>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="admin-meta">Signed in as <span id="admin-email-display">—</span></div>
+            <button class="logout-btn" id="logout-btn">
+                <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+            </button>
+        </div>
+    </aside>
+
+    <!-- ═══ MAIN CONTENT ═════════════════════════════════════ -->
+    <div class="main-content">
+        <div class="topbar">
+            <button class="mobile-menu-btn" id="mobile-menu-btn">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <span class="topbar-title" id="topbar-title">About Section</span>
+            <div class="topbar-badge">
+                <i class="fa-solid fa-circle" style="font-size:0.5rem; color:#059669;"></i>
+                CMS Active
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <!-- ── ABOUT TAB ──────────────────────────────── -->
+            <div class="tab-panel active" id="tab-about">
+                <div class="section-header">
+                    <div>
+                        <h3>About Intro Section</h3>
+                        <p>Edit the text content of the About section on the homepage.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <label class="about-field-label">Lead Paragraph <span style="color:#b91c1c">*</span></label>
+                    <textarea class="about-editor-lead" id="about-lead" placeholder="The bold opening paragraph..."></textarea>
+
+                    <div style="margin-top: 28px;">
+                        <label class="about-field-label">Body Paragraphs</label>
+                        <div class="paragraph-list" id="paragraph-list"></div>
+                        <button class="add-para-btn" id="add-para-btn">
+                            <i class="fa-solid fa-plus"></i> Add Paragraph
+                        </button>
+                    </div>
+
+                    <div class="save-bar">
+                        <button class="btn btn-primary" id="save-about-btn">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Changes
+                        </button>
+                        <div class="save-feedback" id="about-save-feedback">
+                            <i class="fa-solid fa-circle-check"></i> Saved successfully
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── TEAM TAB ───────────────────────────────── -->
+            <div class="tab-panel" id="tab-team">
+                <div class="section-header">
+                    <div>
+                        <h3>Our Team</h3>
+                        <p>Add or remove team member cards shown on the homepage.</p>
+                    </div>
+                    <button class="btn btn-primary" id="add-member-btn">
+                        <i class="fa-solid fa-user-plus"></i> Add Member
+                    </button>
+                </div>
+
+                <div class="table-wrapper">
+                    <table id="team-table">
+                        <thead>
+                            <tr>
+                                <th>Photo</th>
+                                <th>Name</th>
+                                <th>Role / Title</th>
+                                <th>Order</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="team-tbody">
+                            <tr>
+                                <td colspan="5">
+                                    <div class="empty-state">
+                                        <i class="fa-solid fa-users"></i>
+                                        <p>Loading team members...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ── ANNOUNCEMENTS TAB ──────────────────────── -->
+            <div class="tab-panel" id="tab-announcements">
+                <div class="section-header">
+                    <div>
+                        <h3>Announcements</h3>
+                        <p>Manage popup announcements shown to visitors on page load.</p>
+                    </div>
+                    <button class="btn btn-primary" id="add-announcement-btn">
+                        <i class="fa-solid fa-plus"></i> New Announcement
+                    </button>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Message</th>
+                                <th>CTA</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="announcements-tbody">
+                            <tr>
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        <i class="fa-solid fa-bullhorn"></i>
+                                        <p>Loading announcements...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ── SUBSCRIBERS TAB ────────────────────────── -->
+            <div class="tab-panel" id="tab-subscribers">
+                <div class="section-header">
+                    <div>
+                        <h3>Subscribers</h3>
+                        <p>Read-only view of all newsletter subscribers.</p>
+                    </div>
+                    <button class="btn btn-secondary" id="export-csv-btn">
+                        <i class="fa-solid fa-download"></i> Export CSV
+                    </button>
+                </div>
+
+                <div class="sub-stats">
+                    <div class="stat-chip">
+                        <div class="stat-num" id="sub-total">—</div>
+                        <div class="stat-label">Total Subscribers</div>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Signup Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subscribers-tbody">
+                            <tr>
+                                <td colspan="4">
+                                    <div class="empty-state">
+                                        <i class="fa-solid fa-envelope"></i>
+                                        <p>Loading subscribers...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div><!-- /page-content -->
+    </div><!-- /main-content -->
+</div><!-- /admin-layout -->
+
+
+<!-- ════════════════════════════════════════════════════════════
+     MODAL: Add / Edit Team Member
+════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="team-modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h4 id="team-modal-title">Add Team Member</h4>
+            <button class="modal-close" data-close="team-modal-overlay"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="team-form" enctype="multipart/form-data">
+                <input type="hidden" id="team-member-id">
+
+                <div class="form-group">
+                    <label for="member-name">Full Name <span style="color:#b91c1c">*</span></label>
+                    <input type="text" id="member-name" placeholder="e.g. Ejiro Edwards" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="member-role">Role / Title <span style="color:#b91c1c">*</span></label>
+                    <input type="text" id="member-role" placeholder="e.g. Co-Founder" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="member-order">Display Order</label>
+                    <input type="number" id="member-order" placeholder="0" min="0" value="0">
+                </div>
+
+                <div class="form-group">
+                    <label>Profile Photo</label>
+                    <input type="file" id="member-image" accept="image/*">
+                    <div class="img-preview-wrap" id="member-img-preview" style="margin-top:12px;">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" data-close="team-modal-overlay">Cancel</button>
+            <button class="btn btn-primary" id="save-member-btn">
+                <i class="fa-solid fa-floppy-disk"></i> Save Member
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     MODAL: Add / Edit Announcement
+════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="announcement-modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h4 id="announcement-modal-title">New Announcement</h4>
+            <button class="modal-close" data-close="announcement-modal-overlay"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="announcement-form">
+                <input type="hidden" id="announcement-id">
+
+                <div class="form-group">
+                    <label for="ann-title">Title <span style="color:#b91c1c">*</span></label>
+                    <input type="text" id="ann-title" placeholder="e.g. Applications Now Open" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="ann-message">Message <span style="color:#b91c1c">*</span></label>
+                    <textarea id="ann-message" placeholder="The main announcement text..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="ann-cta-label">Button Label <span style="color:var(--muted); font-weight:400;">(optional)</span></label>
+                    <input type="text" id="ann-cta-label" placeholder="e.g. Apply Now">
+                </div>
+
+                <div class="form-group">
+                    <label for="ann-cta-url">Button URL <span style="color:var(--muted); font-weight:400;">(optional)</span></label>
+                    <input type="url" id="ann-cta-url" placeholder="https://...">
+                </div>
+
+                <div class="form-group">
+                    <label>Background Colour</label>
+                    <div class="color-input-wrap">
+                        <input type="color"  id="ann-color-picker" value="#3B5254">
+                        <input type="text"   id="ann-color-hex"    value="#3B5254" placeholder="#3B5254">
+                    </div>
+                </div>
+
+                <div class="toggle-row">
+                    <label for="ann-active">Set as Active (show on site)</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="ann-active" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" data-close="announcement-modal-overlay">Cancel</button>
+            <button class="btn btn-primary" id="save-announcement-btn">
+                <i class="fa-solid fa-floppy-disk"></i> Save
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     MODAL: Confirm Delete
+════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="confirm-modal-overlay">
+    <div class="modal" style="max-width:420px;">
+        <div class="modal-header">
+            <h4>Confirm Delete</h4>
+            <button class="modal-close" data-close="confirm-modal-overlay"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <p id="confirm-modal-message" style="color:var(--muted); line-height:1.7;">Are you sure? This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" data-close="confirm-modal-overlay">Cancel</button>
+            <button class="btn btn-danger" id="confirm-delete-btn">
+                <i class="fa-solid fa-trash"></i> Delete
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<script src="./js/admin.js"></script>
+</body>
+</html>

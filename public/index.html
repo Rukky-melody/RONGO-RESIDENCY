@@ -79,24 +79,12 @@
 
     <section id="about" class="about-intro-section">
         <div class="container pattern-bg">
-            <p class="intro-lead">
-                <strong>Rongo Art Foundation</strong> is a youth-led cultural organisation based in Benin City, Nigeria,
-                working at the intersection of heritage, artistic freedom and professional sustainability.
+            <!-- About content is loaded dynamically from the CMS via /api/about -->
+            <p class="intro-lead" id="about-lead">
+                <!-- Populated by loadAboutContent() in script.js -->
             </p>
-            <div class="intro-body">
-                <p>We exist because emerging artists in Nigeria often possess extraordinary talent but lack the
-                    structural support needed to thrive. Informal contracts, limited legal awareness, mobility barriers
-                    and digital exploitation risks continue to shape the creative landscape. We respond by building
-                    structure through training, advocacy, mentorship and strategic partnerships.</p>
-                <p>Our work includes the <strong>Benin Arts and Books Festival</strong>, which celebrates cultural
-                    expression and social dialogue, and the <strong>Rongo Artist Residency</strong>, a multidisciplinary
-                    programme that combines artistic production with legal literacy, AI protection awareness and
-                    mobility guidance.</p>
-                <p>We are committed to decentralising cultural infrastructure, strengthening professional standards and
-                    ensuring that artists are not merely creative, but protected and positioned for sustainable growth.
-                </p>
-                <p><em>Rongo Art Foundation is rooted in heritage, driven by young leadership and building toward a more
-                        equitable creative future.</em></p>
+            <div class="intro-body" id="about-body">
+                <!-- Populated by loadAboutContent() in script.js -->
             </div>
         </div>
     </section>
@@ -162,7 +150,7 @@
         </div>
     </section>
 
-    <!-- Our Team Section -->
+    <!-- Our Team Section — populated dynamically from /api/team -->
     <section id="team" class="team-section">
         <div class="container">
             <h2 class="section-title center-text">Our Team</h2>
@@ -170,39 +158,8 @@
 
             <div class="team-slider-wrapper">
                 <button class="team-btn prev-btn"><i class="fa-solid fa-chevron-left"></i></button>
-                <div class="team-track">
-
-                    <div class="team-card">
-                        <div class="team-avatar"><i class="fa-solid fa-user"></i></div>
-                        <h3>Ejiro Edwards</h3>
-                        <p>Co-Founder</p>
-                    </div>
-
-                    <div class="team-card">
-                        <div class="team-avatar"><i class="fa-solid fa-user"></i></div>
-                        <h3>Rouna Idjenughwa</h3>
-                        <p>Co-Founder</p>
-                    </div>
-
-                    <div class="team-card">
-                        <div class="team-avatar"><i class="fa-solid fa-user"></i></div>
-                        <h3>Member Name</h3>
-                        <p>Legal Advisor</p>
-                    </div>
-
-                    <div class="team-card">
-                        <div class="team-avatar"><i class="fa-solid fa-user"></i></div>
-                        <h3>Member Name</h3>
-                        <p>Community Manager</p>
-                    </div>
-
-                    <div class="team-card">
-                        <div class="team-avatar"><i class="fa-solid fa-user"></i></div>
-                        <h3>Member Name</h3>
-                        <p>Creative Director</p>
-                    </div>
-
-                </div>
+                <!-- Cards injected by loadTeamMembers() in script.js -->
+                <div class="team-track" id="team-track"></div>
                 <button class="team-btn next-btn"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
         </div>
@@ -369,6 +326,100 @@
         </div>
     </section>
 
+
+    <!-- ═══ ANNOUNCEMENT POPUP ════════════════════════════════════
+         Hidden by default. Shown by loadAnnouncement() if active.
+    ════════════════════════════════════════════════════════════ -->
+    <div id="announcement-overlay" style="
+        display:none;
+        position:fixed;
+        inset:0;
+        background:rgba(26,26,26,0.65);
+        backdrop-filter:blur(6px);
+        z-index:9000;
+        align-items:center;
+        justify-content:center;
+        padding:20px;
+    ">
+        <div id="announcement-card" style="
+            position:relative;
+            background:#fff;
+            border-radius:16px;
+            max-width:480px;
+            width:100%;
+            box-shadow:0 20px 60px rgba(0,0,0,0.25);
+            overflow:hidden;
+            animation:ann-in 0.3s ease;
+        ">
+            <div id="announcement-header" style="
+                padding:28px 28px 20px;
+                background:#3B5254;
+                color:#fff;
+            ">
+                <h2 id="announcement-title" style="
+                    font-family:'Playfair Display',serif;
+                    font-size:1.35rem;
+                    font-weight:400;
+                    margin:0;
+                    line-height:1.4;
+                "></h2>
+            </div>
+            <div style="padding:24px 28px;">
+                <p id="announcement-message" style="
+                    font-size:0.95rem;
+                    line-height:1.7;
+                    color:#444;
+                    margin:0 0 20px;
+                "></p>
+                <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                    <a id="announcement-cta" href="#" target="_blank" style="
+                        display:none;
+                        padding:10px 22px;
+                        background:#3B5254;
+                        color:#fff;
+                        border-radius:8px;
+                        font-size:0.85rem;
+                        font-family:'Inter',sans-serif;
+                        font-weight:500;
+                        text-decoration:none;
+                        letter-spacing:0.05em;
+                    ">Learn More</a>
+                    <button onclick="dismissAnnouncement()" style="
+                        padding:10px 22px;
+                        background:#f5f5f5;
+                        color:#555;
+                        border:none;
+                        border-radius:8px;
+                        font-size:0.85rem;
+                        font-family:'Inter',sans-serif;
+                        cursor:pointer;
+                    ">Dismiss</button>
+                </div>
+            </div>
+            <button onclick="dismissAnnouncement()" style="
+                position:absolute;
+                top:14px;
+                right:14px;
+                width:30px;
+                height:30px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                background:rgba(255,255,255,0.15);
+                border:none;
+                border-radius:50%;
+                color:#fff;
+                font-size:0.85rem;
+                cursor:pointer;
+            "><i class="fa-solid fa-xmark"></i></button>
+        </div>
+    </div>
+    <style>
+        @keyframes ann-in {
+            from { opacity:0; transform:translateY(24px) scale(0.96); }
+            to   { opacity:1; transform:translateY(0) scale(1); }
+        }
+    </style>
 
     <script src="./js/script.js"></script>
 </body>

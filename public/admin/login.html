@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login — Rongo Art Foundation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="./css/admin.css">
+    <style>
+        body { display:flex; align-items:center; justify-content:center; min-height:100vh; background: var(--cream); }
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 48px 40px;
+            box-shadow: 0 8px 40px rgba(59,82,84,0.12);
+            border-top: 4px solid var(--teal);
+        }
+
+        .login-brand {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .login-brand h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--teal);
+            margin-bottom: 4px;
+        }
+
+        .login-brand p {
+            font-size: 0.78rem;
+            color: var(--muted);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .login-card .form-group { margin-bottom: 20px; }
+
+        .login-card label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--dark);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .login-card input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid #e2e8e8;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
+            color: var(--dark);
+            background: #fafafa;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        .login-card input:focus {
+            border-color: var(--teal);
+            box-shadow: 0 0 0 3px rgba(59,82,84,0.1);
+            background: #fff;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 13px;
+            background: var(--teal);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            margin-top: 8px;
+        }
+
+        .login-btn:hover  { background: #2d4042; }
+        .login-btn:active { transform: scale(0.98); }
+        .login-btn:disabled { opacity: 0.65; cursor: not-allowed; }
+
+        .login-error {
+            margin-top: 16px;
+            padding: 10px 14px;
+            background: #fff0f0;
+            border: 1px solid #fca5a5;
+            border-radius: 6px;
+            color: #b91c1c;
+            font-size: 0.85rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-brand">
+                <h1>Rongo Art Foundation</h1>
+                <p>Content Management System</p>
+            </div>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email Address</label>
+                    <input type="email" id="login-email" name="email" placeholder="admin@rongo.org" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" name="password" placeholder="••••••••" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="login-btn" id="login-btn">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>&nbsp; Sign In
+                </button>
+                <div class="login-error" id="login-error"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // If already logged in, redirect to dashboard
+        if (localStorage.getItem('admin_token')) {
+            window.location.href = '/admin/dashboard.html';
+        }
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn   = document.getElementById('login-btn');
+            const errEl = document.getElementById('login-error');
+            errEl.style.display = 'none';
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>&nbsp; Signing in...';
+
+            try {
+                const res  = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email:    document.getElementById('login-email').value,
+                        password: document.getElementById('login-password').value
+                    })
+                });
+                const data = await res.json();
+
+                if (res.ok && data.token) {
+                    localStorage.setItem('admin_token', data.token);
+                    localStorage.setItem('admin_info',  JSON.stringify(data.admin));
+                    window.location.href = '/admin/dashboard.html';
+                } else {
+                    errEl.textContent    = data.error || 'Login failed. Please try again.';
+                    errEl.style.display  = 'block';
+                }
+            } catch {
+                errEl.textContent   = 'Connection error. Please check your internet.';
+                errEl.style.display = 'block';
+            } finally {
+                btn.disabled  = false;
+                btn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i>&nbsp; Sign In';
+            }
+        });
+    </script>
+</body>
+</html>

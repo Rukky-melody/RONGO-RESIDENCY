@@ -1,2 +1,11 @@
 Starting connection attempt...
-Connected successfully!
+Connection Error: bad auth : authentication failed
+MongoServerError: bad auth : authentication failed
+    at Connection.sendCommand (C:\Users\RUKKY\Desktop\RONGO\node_modules\mongodb\lib\cmap\connection.js:320:27)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Connection.command (C:\Users\RUKKY\Desktop\RONGO\node_modules\mongodb\lib\cmap\connection.js:347:26)
+    at async continueScramConversation (C:\Users\RUKKY\Desktop\RONGO\node_modules\mongodb\lib\cmap\auth\scram.js:130:15)
+    at async executeScram (C:\Users\RUKKY\Desktop\RONGO\node_modules\mongodb\lib\cmap\auth\scram.js:79:5)
+    at async ScramSHA1.auth (C:\Users\RUKKY\Desktop\RONGO\node_modules\mongodb\lib\cmap\auth\scram.js:38:16)
+    at async performInitialHandshake (C:\Users\RUKKY\Desktop\RONGO\node_modules\mongodb\lib\cmap\connect.js:110:13)
+    at async connect (C:\Users\RUKKY\Desktop\RONGO\node_modules\mongodb\lib\cmap\connect.js:28:9)

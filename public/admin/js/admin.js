@@ -216,7 +216,7 @@ function setupLogout() {
 
 async function loadAbout() {
     try {
-        const res  = await fetch('/api/about');
+        const res  = await apiFetch('/api/about');
         const data = await res.json();
 
         document.getElementById('about-lead').value = data.leadText || '';
@@ -376,7 +376,7 @@ async function saveTeamMember() {
 
         // Note: Don't set Content-Type — let browser set multipart boundary
         const token = getToken();
-        const res   = await fetch(url, {
+        const res   = await fetch(API + url, {
             method,
             headers: { 'Authorization': `Bearer ${token}` },
             body:    formData

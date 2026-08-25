@@ -474,11 +474,13 @@ h1, h2, h3 {
 .team-slider-wrapper {
     position: relative;
     display: flex;
+    width: 100%;
     align-items: center;
     margin-top: 40px;
 }
 .team-track {
     display: flex;
+    width: 100%;
     gap: 30px;
     overflow-x: auto;
     padding: 30px 40px;

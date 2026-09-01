@@ -122,7 +122,10 @@
                 </div>
                 <div class="form-group">
                     <label for="login-password">Password</label>
-                    <input type="password" id="login-password" name="password" placeholder="••••••••" required autocomplete="current-password">
+                    <div style="position: relative;">
+                        <input type="password" id="login-password" name="password" placeholder="••••••••" required autocomplete="current-password" style="padding-right: 40px;">
+                        <i class="fa-solid fa-eye" id="toggle-login-password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--muted);"></i>
+                    </div>
                 </div>
                 <button type="submit" class="login-btn" id="login-btn">
                     <i class="fa-solid fa-arrow-right-to-bracket"></i>&nbsp; Sign In
@@ -138,6 +141,20 @@
             window.location.href = '/admin/dashboard.html';
         }
 
+        // Password toggle
+        document.getElementById('toggle-login-password').addEventListener('click', function () {
+            const pwd = document.getElementById('login-password');
+            if (pwd.type === 'password') {
+                pwd.type = 'text';
+                this.classList.remove('fa-eye');
+                this.classList.add('fa-eye-slash');
+            } else {
+                pwd.type = 'password';
+                this.classList.remove('fa-eye-slash');
+                this.classList.add('fa-eye');
+            }
+        });
+
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn   = document.getElementById('login-btn');
@@ -148,7 +165,8 @@
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>&nbsp; Signing in...';
 
             try {
-                const res  = await fetch('https://rongo-residency.onrender.com/api/admin/login', {
+                const API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : 'https://rongo-residency.onrender.com';
+                const res  = await fetch(API + '/api/admin/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

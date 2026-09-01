@@ -9,7 +9,9 @@
    1. CONFIG & AUTH UTILITIES
 ════════════════════════════════════════════════════════════ */
 
-const API = 'https://rongo-residency.onrender.com'; // Direct to Render backend
+const API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? '' 
+    : 'https://rongo-residency.onrender.com'; // Direct to Render backend in production, relative locally
 
 function getToken()  { return localStorage.getItem('admin_token'); }
 function getAdmin()  { try { return JSON.parse(localStorage.getItem('admin_info')); } catch { return null; } }
@@ -72,7 +74,8 @@ const TAB_TITLES = {
     about:         'About Section',
     team:          'Our Team',
     announcements: 'Announcements',
-    subscribers:   'Subscribers'
+    subscribers:   'Subscribers',
+    settings:      'Account Settings'
 };
 
 function setupTabs() {
@@ -106,6 +109,7 @@ function switchTab(tab) {
     if (tab === 'team')          loadTeam();
     if (tab === 'announcements') loadAnnouncements();
     if (tab === 'subscribers')   loadSubscribers();
+    if (tab === 'settings')      loadSettings();
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -623,7 +627,93 @@ async function exportCSV() {
 }
 
 /* ════════════════════════════════════════════════════════════
-   12. UTILITIES
+   12. SETTINGS
+════════════════════════════════════════════════════════════ */
+
+function loadSettings() {
+    const admin = getAdmin();
+    if (admin) {
+        document.getElementById('settings-email').value = admin.email || '';
+    }
+    document.getElementById('settings-new-password').value = '';
+    document.getElementById('settings-current-password').value = '';
+}
+
+if (document.getElementById('settings-form')) {
+    // Password toggles
+    const setupToggle = (toggleId, inputId) => {
+        const toggle = document.getElementById(toggleId);
+        if (toggle) {
+            toggle.addEventListener('click', function() {
+                const pwd = document.getElementById(inputId);
+                if (pwd.type === 'password') {
+                    pwd.type = 'text';
+                    this.classList.remove('fa-eye');
+                    this.classList.add('fa-eye-slash');
+                } else {
+                    pwd.type = 'password';
+                    this.classList.remove('fa-eye-slash');
+                    this.classList.add('fa-eye');
+                }
+            });
+        }
+    };
+    
+    setupToggle('toggle-new-password', 'settings-new-password');
+    setupToggle('toggle-current-password', 'settings-current-password');
+
+    document.getElementById('settings-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const btn = document.getElementById('save-settings-btn');
+        const currentPassword = document.getElementById('settings-current-password').value;
+        const newEmail = document.getElementById('settings-email').value.trim();
+        const newPassword = document.getElementById('settings-new-password').value;
+        
+        if (!currentPassword) {
+            toast('Current password is required.', 'error');
+            return;
+        }
+        
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+        
+        try {
+            const res = await apiFetch('/api/admin/credentials', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ currentPassword, newEmail, newPassword })
+            });
+            
+            if (res && res.ok) {
+                const data = await res.json();
+                toast('Settings updated successfully!', 'success');
+                
+                // Update local storage with new token and admin info
+                if (data.token) localStorage.setItem('admin_token', data.token);
+                if (data.admin) {
+                    localStorage.setItem('admin_info', JSON.stringify(data.admin));
+                    document.getElementById('admin-email-display').textContent = data.admin.email;
+                }
+                
+                // Clear passwords
+                document.getElementById('settings-current-password').value = '';
+                document.getElementById('settings-new-password').value = '';
+            } else {
+                const err = await res.json();
+                toast(err.error || 'Failed to update settings.', 'error');
+            }
+        } catch {
+            toast('Connection error.', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Settings';
+        }
+    });
+}
+
+/* ════════════════════════════════════════════════════════════
+   13. UTILITIES
 ════════════════════════════════════════════════════════════ */
 
 /** Escapes HTML special chars to prevent XSS in table renders */

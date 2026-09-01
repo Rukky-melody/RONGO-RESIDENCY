@@ -61,6 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupModals();
     setupMobileMenu();
     setupLogout();
+    setupSubscribers();
 
     // Load initial tab
     loadAbout();
@@ -75,6 +76,7 @@ const TAB_TITLES = {
     team:          'Our Team',
     announcements: 'Announcements',
     subscribers:   'Subscribers',
+    gallery:       'Gallery',
     settings:      'Account Settings'
 };
 
@@ -109,6 +111,7 @@ function switchTab(tab) {
     if (tab === 'team')          loadTeam();
     if (tab === 'announcements') loadAnnouncements();
     if (tab === 'subscribers')   loadSubscribers();
+    if (tab === 'gallery')       loadGallery();
     if (tab === 'settings')      loadSettings();
 }
 
@@ -139,6 +142,25 @@ function setupModals() {
     // Announcement modal
     document.getElementById('add-announcement-btn').addEventListener('click', () => openAddAnnouncementModal());
     document.getElementById('save-announcement-btn').addEventListener('click', saveAnnouncement);
+
+    // Gallery modal
+    const addGalleryBtn = document.getElementById('add-gallery-btn');
+    if (addGalleryBtn) addGalleryBtn.addEventListener('click', () => openAddGalleryModal());
+    const saveGalleryBtn = document.getElementById('save-gallery-btn');
+    if (saveGalleryBtn) saveGalleryBtn.addEventListener('click', saveGalleryItem);
+
+    // Gallery Image preview
+    const galleryImage = document.getElementById('gallery-image');
+    if (galleryImage) {
+        galleryImage.addEventListener('change', e => {
+            const file = e.target.files[0];
+            const wrap = document.getElementById('gallery-img-preview');
+            if (file) {
+                const url = URL.createObjectURL(file);
+                wrap.innerHTML = `<img src="${url}" alt="Preview" style="max-width:100%; max-height:100%; object-fit:contain;">`;
+            }
+        });
+    }
 
     // Colour picker sync
     const colorPicker = document.getElementById('ann-color-picker');
@@ -573,7 +595,7 @@ async function deleteAnnouncement(id) {
 
 async function loadSubscribers() {
     const tbody = document.getElementById('subscribers-tbody');
-    tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="skeleton" style="height:16px;width:200px;margin:0 auto;"></div></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="skeleton" style="height:16px;width:200px;margin:0 auto;"></div></div></td></tr>`;
 
     try {
         const res  = await apiFetch('/api/admin/subscribers');
@@ -582,20 +604,103 @@ async function loadSubscribers() {
         document.getElementById('sub-total').textContent = list.length;
 
         if (!list.length) {
-            tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><i class="fa-solid fa-envelope"></i><p>No subscribers yet.</p></div></td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fa-solid fa-envelope"></i><p>No subscribers yet.</p></div></td></tr>`;
+            document.getElementById('select-all-subs').checked = false;
+            updateBulkDeleteBtn();
             return;
         }
 
         tbody.innerHTML = list.map((s, i) => `
             <tr>
+                <td style="text-align: center;"><input type="checkbox" class="sub-checkbox" value="${s._id}"></td>
                 <td style="color:var(--muted); font-size:0.8rem;">${i + 1}</td>
                 <td>${escHtml(s.fullname)}</td>
                 <td style="font-family:monospace; font-size:0.84rem;">${escHtml(s.email)}</td>
                 <td style="white-space:nowrap; font-size:0.82rem; color:var(--muted);">${s.signupDate ? new Date(s.signupDate).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : 'N/A'}</td>
+                <td>
+                    <button class="btn btn-sm btn-danger" onclick="confirmDeleteSubscriber('${s._id}', '${escHtml(s.email)}')">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </td>
             </tr>`).join('');
+            
+        // Add event listeners to new checkboxes
+        document.querySelectorAll('.sub-checkbox').forEach(cb => {
+            cb.addEventListener('change', updateBulkDeleteBtn);
+        });
+        
+        document.getElementById('select-all-subs').checked = false;
+        updateBulkDeleteBtn();
 
     } catch {
         toast('Failed to load subscribers.', 'error');
+    }
+}
+
+function setupSubscribers() {
+    const selectAll = document.getElementById('select-all-subs');
+    const bulkBtn   = document.getElementById('bulk-delete-sub-btn');
+    
+    if (selectAll) {
+        selectAll.addEventListener('change', (e) => {
+            document.querySelectorAll('.sub-checkbox').forEach(cb => {
+                cb.checked = e.target.checked;
+            });
+            updateBulkDeleteBtn();
+        });
+    }
+    
+    if (bulkBtn) {
+        bulkBtn.addEventListener('click', () => {
+            const selected = Array.from(document.querySelectorAll('.sub-checkbox:checked')).map(cb => cb.value);
+            if (selected.length === 0) return;
+            
+            document.getElementById('confirm-modal-message').textContent = `Delete ${selected.length} selected subscriber(s)? This cannot be undone.`;
+            document.getElementById('confirm-delete-btn').onclick = () => deleteSubscribersBulk(selected);
+            openModal('confirm-modal-overlay');
+        });
+    }
+}
+
+function updateBulkDeleteBtn() {
+    const checkedBoxes = document.querySelectorAll('.sub-checkbox:checked');
+    const bulkBtn = document.getElementById('bulk-delete-sub-btn');
+    const selectAll = document.getElementById('select-all-subs');
+    const allBoxes = document.querySelectorAll('.sub-checkbox');
+    
+    if (bulkBtn) {
+        bulkBtn.style.display = checkedBoxes.length > 0 ? 'inline-block' : 'none';
+    }
+    
+    if (selectAll && allBoxes.length > 0) {
+        selectAll.checked = checkedBoxes.length === allBoxes.length;
+    }
+}
+
+function confirmDeleteSubscriber(id, email) {
+    document.getElementById('confirm-modal-message').textContent = `Delete subscriber "${email}"? This cannot be undone.`;
+    document.getElementById('confirm-delete-btn').onclick = () => deleteSubscribersBulk([id]);
+    openModal('confirm-modal-overlay');
+}
+
+async function deleteSubscribersBulk(ids) {
+    closeModal('confirm-modal-overlay');
+    try {
+        const url = ids.length === 1 ? `/api/admin/subscribers/${ids[0]}` : '/api/admin/subscribers/bulk-delete';
+        const method = ids.length === 1 ? 'DELETE' : 'POST';
+        const body = ids.length === 1 ? null : JSON.stringify({ ids });
+        const headers = ids.length === 1 ? {} : { 'Content-Type': 'application/json' };
+        
+        const res = await apiFetch(url, { method, headers, body });
+        
+        if (res && res.ok) {
+            toast(ids.length === 1 ? 'Subscriber deleted.' : `${ids.length} subscribers deleted.`, 'success');
+            loadSubscribers();
+        } else {
+            toast('Delete failed.', 'error');
+        }
+    } catch {
+        toast('Connection error.', 'error');
     }
 }
 
@@ -713,7 +818,150 @@ if (document.getElementById('settings-form')) {
 }
 
 /* ════════════════════════════════════════════════════════════
-   13. UTILITIES
+   13. GALLERY
+════════════════════════════════════════════════════════════ */
+
+async function loadGallery() {
+    const tbody = document.getElementById('gallery-tbody');
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="skeleton" style="height:16px;width:200px;margin:0 auto;"></div></div></td></tr>`;
+
+    try {
+        const res  = await apiFetch('/api/gallery');
+        const items = await res.json();
+
+        if (!items.length) {
+            tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fa-solid fa-images"></i><p>No gallery items yet. Add your first photo!</p></div></td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = items.map(g => `
+            <tr>
+                <td>
+                    ${g.imageUrl
+                        ? `<img class="team-avatar-sm" src="${g.imageUrl}" style="object-fit:cover; border-radius:4px;" alt="${g.title}">`
+                        : `<div class="team-avatar-placeholder"><i class="fa-solid fa-image"></i></div>`}
+                </td>
+                <td><strong>${escHtml(g.title)}</strong></td>
+                <td style="max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                    <a href="${escHtml(g.linkUrl)}" target="_blank" style="font-size:0.85rem; color:var(--teal);">${escHtml(g.linkUrl)}</a>
+                </td>
+                <td>${g.order}</td>
+                <td>
+                    <div class="td-actions">
+                        <button class="btn btn-sm btn-secondary" onclick="openEditGalleryModal('${g._id}', '${escHtml(g.title).replace(/'/g, "\\'")}', '${escHtml(g.linkUrl).replace(/'/g, "\\'")}', ${g.order}, '${g.imageUrl || ''}')">
+                            <i class="fa-solid fa-pen"></i> Edit
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="confirmDeleteGallery('${g._id}', '${escHtml(g.title).replace(/'/g, "\\'")}')">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>`).join('');
+
+    } catch {
+        toast('Failed to load gallery items.', 'error');
+    }
+}
+
+function openAddGalleryModal() {
+    document.getElementById('gallery-modal-title').textContent = 'Add Gallery Item';
+    document.getElementById('gallery-item-id').value = '';
+    document.getElementById('gallery-title').value   = '';
+    document.getElementById('gallery-link').value    = '';
+    document.getElementById('gallery-order').value   = '0';
+    document.getElementById('gallery-image').value   = '';
+    document.getElementById('gallery-img-preview').innerHTML = '<i class="fa-solid fa-image"></i>';
+    openModal('gallery-modal-overlay');
+}
+
+function openEditGalleryModal(id, title, linkUrl, order, imgUrl) {
+    document.getElementById('gallery-modal-title').textContent = 'Edit Gallery Item';
+    document.getElementById('gallery-item-id').value = id;
+    document.getElementById('gallery-title').value   = title;
+    document.getElementById('gallery-link').value    = linkUrl;
+    document.getElementById('gallery-order').value   = order;
+    document.getElementById('gallery-image').value   = '';
+
+    const preview = document.getElementById('gallery-img-preview');
+    preview.innerHTML = imgUrl
+        ? `<img src="${imgUrl}" alt="${title}" style="max-width:100%; max-height:100%; object-fit:contain;">`
+        : `<i class="fa-solid fa-image"></i>`;
+
+    openModal('gallery-modal-overlay');
+}
+
+async function saveGalleryItem() {
+    const btn   = document.getElementById('save-gallery-btn');
+    const id    = document.getElementById('gallery-item-id').value;
+    const title = document.getElementById('gallery-title').value.trim();
+    const link  = document.getElementById('gallery-link').value.trim();
+    const order = document.getElementById('gallery-order').value;
+    const file  = document.getElementById('gallery-image').files[0];
+
+    if (!title || !link) { toast('Title and Link URL are required.', 'error'); return; }
+
+    const formData = new FormData();
+    formData.append('title',   title);
+    formData.append('linkUrl', link);
+    formData.append('order',   order);
+    if (file) formData.append('image', file);
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+    try {
+        const url    = id ? `/api/admin/gallery/${id}` : '/api/admin/gallery';
+        const method = id ? 'PUT' : 'POST';
+
+        const token = getToken();
+        const res   = await fetch(API + url, {
+            method,
+            headers: { 'Authorization': `Bearer ${token}` },
+            body:    formData
+        });
+
+        if (res.status === 401) { clearAuth(); return; }
+
+        if (res.ok) {
+            toast(id ? 'Gallery item updated!' : 'Gallery item added!', 'success');
+            closeModal('gallery-modal-overlay');
+            loadGallery();
+        } else {
+            const err = await res.json();
+            toast(err.error || 'Save failed.', 'error');
+        }
+    } catch {
+        toast('Connection error.', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Item';
+    }
+}
+
+function confirmDeleteGallery(id, title) {
+    document.getElementById('confirm-modal-message').textContent =
+        `Delete gallery item "${title}"? This cannot be undone.`;
+    document.getElementById('confirm-delete-btn').onclick = () => deleteGalleryItem(id);
+    openModal('confirm-modal-overlay');
+}
+
+async function deleteGalleryItem(id) {
+    closeModal('confirm-modal-overlay');
+    try {
+        const res = await apiFetch(`/api/admin/gallery/${id}`, { method: 'DELETE' });
+        if (res && res.ok) {
+            toast('Gallery item deleted.', 'success');
+            loadGallery();
+        } else {
+            toast('Delete failed.', 'error');
+        }
+    } catch {
+        toast('Connection error.', 'error');
+    }
+}
+
+/* ════════════════════════════════════════════════════════════
+   14. UTILITIES
 ════════════════════════════════════════════════════════════ */
 
 /** Escapes HTML special chars to prevent XSS in table renders */

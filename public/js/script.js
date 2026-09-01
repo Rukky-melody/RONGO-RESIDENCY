@@ -290,6 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadAboutContent();
     loadTeamMembers();
     loadAnnouncement();
+    loadGalleryItems();
 });
 
 /**
@@ -417,4 +418,38 @@ function dismissAnnouncement() {
     const overlay = document.getElementById('announcement-overlay');
     if (overlay) overlay.style.display = 'none';
     sessionStorage.setItem('rongo_ann_dismissed', '1');
+}
+
+/**
+ * Fetches gallery items from /api/gallery and renders them into the grid.
+ * Preserves the original HTML classes and structure so the size remains intact.
+ */
+async function loadGalleryItems() {
+    const grid = document.getElementById('gallery-grid');
+    if (!grid) return;
+
+    try {
+        // Use dynamic API endpoint so it works both locally and on Render
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const API_URL = isLocal ? 'http://localhost:2026' : 'https://rongo-residency.onrender.com';
+        
+        const res = await fetch(`${API_URL}/api/gallery`);
+        if (!res.ok) return;
+        const items = await res.json();
+
+        if (!items || items.length === 0) {
+            grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: var(--muted);">No gallery items currently available.</p>';
+            return;
+        }
+
+        grid.innerHTML = items.map(g => `
+            <a href="${g.linkUrl}" target="_blank" class="gallery-item"
+                style="background-image: url('${g.imageUrl}');">
+                <div class="gallery-overlay"><span>${g.title}</span></div>
+            </a>
+        `).join('');
+
+    } catch (err) {
+        console.warn('Could not load gallery from CMS:', err.message);
+    }
 }

@@ -16,6 +16,7 @@ const aboutRoutes        = require('./routes/aboutRoutes');
 const teamRoutes         = require('./routes/teamRoutes');
 const announcementRoutes = require('./routes/announcementRoutes');
 const subscriberAdminRoutes = require('./routes/subscriberAdminRoutes');
+const galleryRoutes      = require('./routes/galleryRoutes');
 
 const app  = express();
 const PORT = process.env.PORT || 2026;
@@ -42,6 +43,7 @@ app.use('/', aboutRoutes);
 app.use('/', teamRoutes);
 app.use('/', announcementRoutes);
 app.use('/', subscriberAdminRoutes);
+app.use('/', galleryRoutes);
 
 // 5. Global Error Handler
 app.use((err, req, res, next) => {

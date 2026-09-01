@@ -44,4 +44,40 @@ const exportSubscribersCSV = async (req, res) => {
     }
 };
 
-module.exports = { getSubscribers, exportSubscribersCSV };
+/**
+ * DELETE /api/admin/subscribers/:id
+ * Protected — deletes a single subscriber by ID.
+ */
+const deleteSubscriber = async (req, res) => {
+    try {
+        const deleted = await Subscriber.findByIdAndDelete(req.params.id);
+        if (!deleted) {
+            return res.status(404).json({ error: 'Subscriber not found.' });
+        }
+        res.json({ success: true, message: 'Subscriber deleted successfully.' });
+    } catch (err) {
+        console.error('deleteSubscriber error:', err.message);
+        res.status(500).json({ error: 'Failed to delete subscriber.' });
+    }
+};
+
+/**
+ * POST /api/admin/subscribers/bulk-delete
+ * Protected — deletes multiple subscribers given an array of IDs.
+ */
+const bulkDeleteSubscribers = async (req, res) => {
+    try {
+        const { ids } = req.body;
+        if (!Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ error: 'Please provide an array of subscriber IDs.' });
+        }
+        
+        await Subscriber.deleteMany({ _id: { $in: ids } });
+        res.json({ success: true, message: `${ids.length} subscribers deleted successfully.` });
+    } catch (err) {
+        console.error('bulkDeleteSubscribers error:', err.message);
+        res.status(500).json({ error: 'Failed to bulk delete subscribers.' });
+    }
+};
+
+module.exports = { getSubscribers, exportSubscribersCSV, deleteSubscriber, bulkDeleteSubscribers };

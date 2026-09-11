@@ -69,7 +69,7 @@ const updateCredentials = async (req, res) => {
 
         const isMatch = await bcrypt.compare(currentPassword, admin.password);
         if (!isMatch) {
-            return res.status(401).json({ error: 'Incorrect current password.' });
+            return res.status(400).json({ error: 'Incorrect current password.' });
         }
 
         if (newEmail) {

@@ -1,5 +1,5 @@
 /**
- * RONGO ART FOUNDATION — Admin CMS JavaScript
+ * RONGO ART FOUNDATION - Admin CMS JavaScript
  * Handles: Auth verification, Tab navigation, About CRUD,
  *          Team CRUD with image upload, Announcement CRUD,
  *          Subscriber list & CSV export, Toast notifications.
@@ -123,7 +123,7 @@ function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 function setupModals() {
-    // Close buttons — [data-close="overlay-id"]
+    // Close buttons - [data-close="overlay-id"]
     document.querySelectorAll('[data-close]').forEach(btn => {
         btn.addEventListener('click', () => closeModal(btn.dataset.close));
     });
@@ -400,7 +400,7 @@ async function saveTeamMember() {
         const url    = id ? `/api/admin/team/${id}` : '/api/admin/team';
         const method = id ? 'PUT' : 'POST';
 
-        // Note: Don't set Content-Type — let browser set multipart boundary
+        // Note: Don't set Content-Type - let browser set multipart boundary
         const token = getToken();
         const res   = await fetch(API + url, {
             method,
@@ -469,7 +469,7 @@ async function loadAnnouncements() {
             <tr>
                 <td><strong>${escHtml(a.title)}</strong></td>
                 <td style="max-width:220px;"><span style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(a.message)}</span></td>
-                <td>${a.ctaLabel ? `<span style="font-size:0.8rem;">${escHtml(a.ctaLabel)}</span>` : '<span style="color:var(--muted);font-size:0.8rem;">—</span>'}</td>
+                <td>${a.ctaLabel ? `<span style="font-size:0.8rem;">${escHtml(a.ctaLabel)}</span>` : '<span style="color:var(--muted);font-size:0.8rem;">-</span>'}</td>
                 <td>
                     <span class="badge ${a.isActive ? 'badge-active' : 'badge-inactive'}">
                         <i class="fa-solid fa-circle" style="font-size:0.45rem;"></i>
